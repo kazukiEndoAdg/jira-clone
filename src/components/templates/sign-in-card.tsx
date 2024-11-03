@@ -35,17 +35,17 @@ export const SignInCard = () => {
       onSubmit={handleSubmit}
     >
       <div>
-        <label>Email</label>
+        <label className="text-gray-500">Email</label>
         <input
           onChange={(e) => setEmail(e.target.value)}
-          className="outline outline-1 outline-black rounded-sm w-full"
+          className="outline outline-1 outline-black rounded-sm w-full p-1"
         />
       </div>
       <div>
-        <label>Password</label>
+        <label className="text-gray-500">Password</label>
         <input
           onChange={(e) => setPassword(e.target.value)}
-          className="outline outline-1 outline-black rounded-sm w-full"
+          className="outline outline-1 outline-black rounded-sm w-full p-1"
         />
       </div>
       <button className="bg-blue-500 rounded-sm text-white p-2">
