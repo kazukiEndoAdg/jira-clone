@@ -1,6 +1,8 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { InvoiceKeys } from "@/app/page";
+import { SortDirection } from "@/utils/sort";
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -68,58 +70,88 @@ TableRow.displayName = "TableRow";
 
 /* Header definition */
 
-type SortDirection = "asc" | "desc" | undefined;
-
 interface SortableTableHeadProps
   extends React.ThHTMLAttributes<HTMLTableCellElement> {
   sortable?: boolean;
   sortKey?: InvoiceKeys;
   sortDirection?: SortDirection;
+  label?: string;
   onSort?: (key: InvoiceKeys) => void;
 }
 
-export type Invoice = {
-  invoice: string;
-  paymentStatus: string;
-  totalAmount: string;
-  paymentMethod: string;
-};
-
-export type InvoiceKeys = keyof Invoice;
-
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  SortableTableHeadProps
->(({ className, sortable, sortKey, sortDirection, onSort, ...props }, ref) => {
+const TableHead = ({
+  className,
+  sortable,
+  sortKey,
+  sortDirection,
+  label,
+  onSort,
+  ...props
+}: SortableTableHeadProps) => {
   const handleSort = () => {
     if (sortable && sortKey && onSort) {
       onSort(sortKey);
     }
   };
 
-  // const getSortIcon = () => {
-  //   if (!sortable || !sortKey) return null
-
-  //   if (!sortDirection) {
-  //     return <ArrowUpDown className="ml-2 h-4 w-4 inline-block" />
-  //   }
-  //   return sortDirection === "asc"
-  //     ? <ArrowUp className="ml-2 h-4 w-4 inline-block" />
-  //     : <ArrowDown className="ml-2 h-4 w-4 inline-block" />
-  // }
+  const getSortIcon = () => {
+    if (!sortDirection) {
+      return <span className="ml-2 h-4 w-4 inline-block">↑</span>;
+    }
+    return sortDirection === "asc" ? (
+      <span className="ml-2 h-4 w-4 inline-block">↑</span>
+    ) : (
+      <div className="ml-2 h-4 w-4 inline-block">↓</div>
+    );
+  };
 
   return (
     <th
-      ref={ref}
       className={cn(
-        "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] cursor-pointer",
         className
       )}
       {...props}
       onClick={handleSort}
-    />
+    >
+      {label} {getSortIcon()}
+    </th>
   );
-});
+};
+
+// const TableHead = React.forwardRef<
+//   HTMLTableCellElement,
+//   SortableTableHeadProps
+// >(({ className, sortable, sortKey, sortDirection, onSort, ...props }, ref) => {
+//   const handleSort = () => {
+//     if (sortable && sortKey && onSort) {
+//       onSort(sortKey);
+//     }
+//   };
+
+// const getSortIcon = () => {
+//   if (!sortable || !sortKey) return null
+
+//   if (!sortDirection) {
+//     return <ArrowUpDown className="ml-2 h-4 w-4 inline-block" />
+//   }
+//   return sortDirection === "asc"
+//     ? <ArrowUp className="ml-2 h-4 w-4 inline-block" />
+//     : <ArrowDown className="ml-2 h-4 w-4 inline-block" />
+// }
+
+//   return (
+//     <th
+//       ref={ref}
+//       className={cn(
+//         "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+//         className
+//       )}
+//       {...props}
+//       onClick={handleSort}
+//     />
+//   );
+// });
 TableHead.displayName = "TableHead";
 
 const TableCell = React.forwardRef<

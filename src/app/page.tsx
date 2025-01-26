@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  InvoiceKeys,
-  SortDirection,
   Table,
   TableBody,
   TableCaption,
@@ -12,7 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { executeSort, getNewSortConfig, SortConfig } from "@/utils/sort";
 import { useState } from "react";
+
+export type Invoice = {
+  invoice: string;
+  paymentStatus: string;
+  totalAmount: string;
+  paymentMethod: string;
+};
+
+export type InvoiceKeys = keyof Invoice;
 
 export default function Home() {
   const [invoices, setInvoices] = useState([
@@ -60,40 +68,16 @@ export default function Home() {
     },
   ]);
 
-  const [sortConfig, setSortConfig] = useState<{
-    key: string | null;
-    direction: SortDirection;
-  }>({
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: "asc",
   });
 
   const handleSort = (key: InvoiceKeys) => {
-    setSortConfig((current) => {
-      const direction =
-        current.key === key && current.direction === "asc" ? "desc" : "asc";
-      console.log("sort started", direction);
-
-      return {
-        key,
-        direction,
-      };
-    });
-
-    setInvoices((currentInvoices) => {
-      const direction =
-        sortConfig.key === key && sortConfig.direction === "asc"
-          ? "desc"
-          : "asc";
-      const sortedData = [...currentInvoices].sort((a, b) => {
-        if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-        if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
-        return 0;
-      });
-
-      console.log("sort completed", direction, sortedData);
-      return sortedData;
-    });
+    setSortConfig((current) => getNewSortConfig(current, key));
+    setInvoices((currentInvoices) =>
+      executeSort<Invoice>(sortConfig, key, currentInvoices)
+    );
   };
   return (
     <>
@@ -104,6 +88,7 @@ export default function Home() {
             <TableHead
               sortable
               sortKey="invoice"
+              label="invoice"
               sortDirection={
                 sortConfig.key === "invoice" ? sortConfig.direction : undefined
               }
@@ -111,9 +96,46 @@ export default function Home() {
             >
               Invoice
             </TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead
+              sortable
+              sortKey="paymentStatus"
+              label="paymentStatus"
+              sortDirection={
+                sortConfig.key === "paymentStatus"
+                  ? sortConfig.direction
+                  : undefined
+              }
+              onSort={handleSort}
+            >
+              Status
+            </TableHead>
+            <TableHead
+              sortable
+              sortKey="paymentMethod"
+              label="paymentMethod"
+              sortDirection={
+                sortConfig.key === "paymentMethod"
+                  ? sortConfig.direction
+                  : undefined
+              }
+              onSort={handleSort}
+            >
+              Method
+            </TableHead>
+            <TableHead
+              className="text-right"
+              sortable
+              sortKey="totalAmount"
+              label="totalAmount"
+              sortDirection={
+                sortConfig.key === "totalAmount"
+                  ? sortConfig.direction
+                  : undefined
+              }
+              onSort={handleSort}
+            >
+              Amount
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
