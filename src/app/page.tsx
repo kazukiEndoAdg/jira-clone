@@ -1,5 +1,7 @@
 "use client";
 
+/** This page is associated with the route /. */
+
 import {
   Table,
   TableBody,
